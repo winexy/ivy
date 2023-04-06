@@ -12,6 +12,28 @@
 "(def foo (bar) (+ bar 10))"
 ```
 
+### Variable declaration
+```
+(var foo 10)
+```
+
+### Assignment expression
+```
+(set foo 10)
+```
+
+### Variable access
+```
+foo
+(square 2)
+```
+
+### Environment structure
+- **Environment Record** (actual storage)
+- Optional reference to **Parent Enivronment**
+
+
+
 ### Lambda expression. IILE - Immediately-invoked lambda expression
 
 ```
