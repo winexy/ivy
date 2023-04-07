@@ -32,7 +32,18 @@ foo
 - **Environment Record** (actual storage)
 - Optional reference to **Parent Enivronment**
 
+### Block scope
+Creates new environment
+```
+(var x 10) 
+(print x) // 10
+(begin
+  (var x 20)
+  (print x) // 20
+)
 
+print(x) // 10
+```
 
 ### Lambda expression. IILE - Immediately-invoked lambda expression
 

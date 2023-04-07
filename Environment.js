@@ -1,5 +1,5 @@
 class Environment {
-  constructor(predefinedEnv) {
+  constructor(predefinedEnv = {}, parentEnv = null) {
     this.record = new Map(Object.entries(predefinedEnv));
   }
 

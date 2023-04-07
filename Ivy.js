@@ -17,25 +17,25 @@ class Ivy {
     // Math operations
 
     if (exp[0] === '+') {
-      return this.eval(exp[1]) + this.eval(exp[2]);
+      return this.eval(exp[1], env) + this.eval(exp[2], env);
     }
 
     if (exp[0] === '-') {
-      return this.eval(exp[1]) - this.eval(exp[2]);
+      return this.eval(exp[1], env) - this.eval(exp[2], env);
     }
 
     if (exp[0] === '*') {
-      return this.eval(exp[1]) * this.eval(exp[2]);
+      return this.eval(exp[1], env) * this.eval(exp[2], env);
     }
 
     if (exp[0] === '/') {
-      return this.eval(exp[1]) / this.eval(exp[2]);
+      return this.eval(exp[1], env) / this.eval(exp[2], env);
     }
 
     // Variable declaration:
     if (exp[0] === 'var') {
       const [, name, value] = exp;
-      return env.define(name, this.eval(value));
+      return env.define(name, this.eval(value, env));
     }
 
     // Variable access:
@@ -43,10 +43,22 @@ class Ivy {
       return env.lookup(exp);
     }
 
-    if (exp[0] === 'set') {
+    if (exp[0] === 'begin') {
+      const blockEnvironment = new Environment({}, env);
+      return this.#evalBlock(exp.slice(1), blockEnvironment);
     }
 
     throw `Unimplemented: ${JSON.stringify(exp)}`;
+  }
+
+  #evalBlock(expressions, env) {
+    let result;
+
+    expressions.forEach(exp => {
+      result = this.eval(exp, env);
+    });
+
+    return result;
   }
 }
 

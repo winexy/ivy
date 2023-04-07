@@ -35,4 +35,29 @@ assert.strictEqual(ivy.eval('null'), null);
 assert.strictEqual(ivy.eval('VERSION'), '0.1');
 assert.strictEqual(ivy.eval(['var', 'isUser', 'true']), true);
 
+// Blocks
+
+assert.strictEqual(
+  ivy.eval([
+    'begin',
+    ['var', 'x', 10],
+    ['var', 'y', 20],
+    ['+', ['*', 'x', 'y'], 30]
+  ]),
+  230
+);
+
+assert.strictEqual(
+  ivy.eval([
+    'begin', 
+    ['var', 'x', 10], 
+    ['begin', 
+      ['var', 'x', 20], 
+      'x'
+    ],
+    'x'
+  ]),
+  10
+);
+
 console.log('All assertions passed');
