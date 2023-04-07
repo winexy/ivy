@@ -51,6 +51,22 @@ print(x) // 10
 (lambda (x) (\* x x) 10)
 ```
 
+### If expression
+```
+(if (> x 5)
+  (set x 20)
+  (begin
+    (set x 30)
+    (print x)))
+```
+
+### While expression
+```
+(while (> x 5)
+  (begin 
+    (print x)
+    (-- x)))
+```
 
 ## Design goals
 

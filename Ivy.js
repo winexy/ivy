@@ -32,6 +32,27 @@ class Ivy {
       return this.eval(exp[1], env) / this.eval(exp[2], env);
     }
 
+    // Comparison operations
+    if (exp[0] === '>') {
+      return this.eval(exp[1], env) > this.eval(exp[2], env);
+    }
+
+    if (exp[0] === '<') {
+      return this.eval(exp[1], env) < this.eval(exp[2], env);
+    }
+
+    if (exp[0] === '>=') {
+      return this.eval(exp[1], env) >= this.eval(exp[2], env);
+    }
+
+    if (exp[0] === '<=') {
+      return this.eval(exp[1], env) <= this.eval(exp[2], env);
+    }
+
+    if (exp[0] === '=') {
+      return this.eval(exp[1], env) === this.eval(exp[2], env);
+    }
+
     // Variable declaration:
     if (exp[0] === 'var') {
       const [, name, value] = exp;
@@ -40,7 +61,7 @@ class Ivy {
 
     if (exp[0] === 'set') {
       const [, name, value] = exp;
-      return env.assign(name, this.eval(value, env))
+      return env.assign(name, this.eval(value, env));
     }
 
     // Variable access:
@@ -51,6 +72,24 @@ class Ivy {
     if (exp[0] === 'begin') {
       const blockEnvironment = new Environment({}, env);
       return this.#evalBlock(exp.slice(1), blockEnvironment);
+    }
+
+    if (exp[0] === 'if') {
+      const [, condition, consequent, alternative] = exp;
+      if (this.eval(condition, env)) {
+        return this.eval(consequent, env);
+      } else {
+        return this.eval(alternative, env);
+      }
+    }
+
+    if (exp[0] === 'while') {
+      const [, condition, body] = exp;
+      let result;
+      while (this.eval(condition, env)) {
+        result = this.eval(body, env);
+      }
+      return result;
     }
 
     throw `Unimplemented: ${JSON.stringify(exp)}`;
