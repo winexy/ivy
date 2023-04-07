@@ -60,4 +60,39 @@ assert.strictEqual(
   10
 );
 
+assert.strictEqual(
+  ivy.eval([
+    'begin',
+    ['var', 'value', 10],
+    ['var', 'result', ['begin',
+      ['var', 'x', ['+', 'value', 10]],
+      'x',
+
+    ]],
+    'result'
+  ]),
+  20
+)
+
+assert.strictEqual(
+  ivy.eval([
+    'begin',
+      ['var', 'data', 10],
+      ['begin',
+        ['set', 'data', 100],
+      ],
+      'data'
+  ]), 100
+)
+
+assert.strictEqual(
+  ivy.eval([
+    'begin',
+    ['var', 'data', 10],
+    ['var', 'result', 'null'],
+    ['set', 'result', 'data'],
+  ]),
+  10
+)
+
 console.log('All assertions passed');

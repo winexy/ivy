@@ -38,6 +38,11 @@ class Ivy {
       return env.define(name, this.eval(value, env));
     }
 
+    if (exp[0] === 'set') {
+      const [, name, value] = exp;
+      return env.assign(name, this.eval(value, env))
+    }
+
     // Variable access:
     if (isVariableName(exp)) {
       return env.lookup(exp);
