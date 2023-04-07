@@ -1,4 +1,5 @@
 import assert from 'node:assert';
+import { testUtil } from './test-util.js';
 
 export default ivy => {
   assert.strictEqual(
@@ -49,5 +50,16 @@ export default ivy => {
       ['set', 'result', 'data']
     ]),
     10
+  );
+
+  testUtil.test(
+    ivy,
+    `
+    (begin
+      (var x 10.5)
+      (var y 20)
+      (+ (* x 10) y))
+  `,
+    125
   );
 };
