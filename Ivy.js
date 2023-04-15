@@ -3,9 +3,24 @@ import { Environment } from './Environment.js';
 class Ivy {
   constructor(global = GlobalEnvironment) {
     this.global = global;
+    this.callStack = [];
   }
 
   eval(exp, env = this.global) {
+    try {
+      this.#eval(exp, env);
+    } catch (cause) {
+      const error = new Error(cause.message);
+      error.stack = this.callStack
+        .map(call => `  at ${call.name}`)
+        .reverse()
+        .join('\n');
+
+      throw error;
+    }
+  }
+
+  #eval(exp, env = this.global) {
     if (this.#isNumber(exp)) {
       return exp;
     }
@@ -17,12 +32,12 @@ class Ivy {
     // Variable declaration:
     if (exp[0] === 'var') {
       const [, name, value] = exp;
-      return env.define(name, this.eval(value, env));
+      return env.define(name, this.#eval(value, env));
     }
 
     if (exp[0] === 'set') {
       const [, name, value] = exp;
-      return env.assign(name, this.eval(value, env));
+      return env.assign(name, this.#eval(value, env));
     }
 
     // Variable access:
@@ -37,18 +52,18 @@ class Ivy {
 
     if (exp[0] === 'if') {
       const [, condition, consequent, alternative] = exp;
-      if (this.eval(condition, env)) {
-        return this.eval(consequent, env);
+      if (this.#eval(condition, env)) {
+        return this.#eval(consequent, env);
       } else {
-        return this.eval(alternative, env);
+        return this.#eval(alternative, env);
       }
     }
 
     if (exp[0] === 'while') {
       const [, condition, body] = exp;
       let result;
-      while (this.eval(condition, env)) {
-        result = this.eval(body, env);
+      while (this.#eval(condition, env)) {
+        result = this.#eval(body, env);
       }
       return result;
     }
@@ -56,9 +71,15 @@ class Ivy {
     // Function declaration:
     if (exp[0] === 'fun') {
       const [, name, params, body] = exp;
-      const varExp = ['var', name, ['lambda', params, body]];
 
-      return this.eval(varExp, env);
+      const fn = {
+        name,
+        params,
+        body,
+        env
+      };
+
+      return env.define(name, fn);
     }
 
     // Lambda expression
@@ -81,12 +102,15 @@ class Ivy {
     // (> foo bar)
 
     if (Array.isArray(exp)) {
-      const fn = this.eval(exp[0], env);
-      const args = exp.slice(1).map(arg => this.eval(arg, env));
+      const fn = this.#eval(exp[0], env);
+      const args = exp.slice(1).map(arg => this.#eval(arg, env));
 
       // Native functions
       if (typeof fn === 'function') {
-        return fn(...args);
+        this.callStack.push(fn);
+        const result = fn(...args);
+        this.callStack.pop();
+        return result;
       }
 
       // User defined functions:
@@ -98,7 +122,10 @@ class Ivy {
 
       const activationEnv = new Environment(activationRecord, fn.env);
 
-      return this.#evalBody(fn.body, activationEnv);
+      this.callStack.push(fn);
+      const reuslt = this.#evalBody(fn.body, activationEnv);
+      this.callStack.pop();
+      return reuslt;
     }
 
     throw `Unimplemented: ${JSON.stringify(exp)}`;
@@ -109,14 +136,14 @@ class Ivy {
       return this.#evalBlock(body.slice(1), env);
     }
 
-    return this.eval(body, env);
+    return this.#eval(body, env);
   }
 
   #evalBlock(expressions, env) {
     let result;
 
     expressions.forEach(exp => {
-      result = this.eval(exp, env);
+      result = this.#eval(exp, env);
     });
 
     return result;
