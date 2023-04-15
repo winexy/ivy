@@ -56,15 +56,9 @@ class Ivy {
     // Function declaration:
     if (exp[0] === 'fun') {
       const [, name, params, body] = exp;
-      
-      const fn = {
-        name,
-        params,
-        body,
-        env // Closure
-      };
+      const varExp = ['var', name, ['lambda', params, body]];
 
-      return env.define(name, fn);
+      return this.eval(varExp, env);
     }
 
     // Lambda expression
@@ -76,7 +70,7 @@ class Ivy {
         params,
         body,
         env
-      }
+      };
 
       return fn;
     }
