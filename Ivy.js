@@ -53,13 +53,27 @@ class Ivy {
       return result;
     }
 
+    // Function declaration:
+    if (exp[0] === 'fun') {
+      const [, name, params, body] = exp;
+      
+      const fn = {
+        name,
+        params,
+        body,
+        env // Closure
+      };
+
+      return env.define(name, fn);
+    }
+
     // Function calls:
     // (print "hello world")
     // (+ x 5)
     // (> foo bar)
 
     if (Array.isArray(exp)) {
-      const fn = this.eval(exp[0]);
+      const fn = this.eval(exp[0], env);
       const args = exp.slice(1).map(arg => this.eval(arg, env));
 
       // Native functions
@@ -68,9 +82,26 @@ class Ivy {
       }
 
       // User defined functions:
+      const activationRecord = {};
+
+      fn.params.forEach((param, index) => {
+        activationRecord[param] = args[index];
+      });
+
+      const activationEnv = new Environment(activationRecord, fn.env);
+
+      return this.#evalBody(fn.body, activationEnv);
     }
 
     throw `Unimplemented: ${JSON.stringify(exp)}`;
+  }
+
+  #evalBody(body, env) {
+    if (body[0] === 'begin') {
+      return this.#evalBlock(body.slice(1), env);
+    }
+
+    return this.eval(body, env);
   }
 
   #evalBlock(expressions, env) {

@@ -9,7 +9,7 @@
 
 ### Function declaration
 ```
-"(def foo (bar) (+ bar 10))"
+"(fun foo (bar) (+ bar 10))"
 ```
 
 ### Variable declaration
