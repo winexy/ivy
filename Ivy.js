@@ -1,20 +1,25 @@
 import { Environment } from './Environment.js';
+import { Transformer } from './Transformer.js';
 
 class Ivy {
+  #transformer = new Transformer();
+  #callStack = [];
+
   constructor(global = GlobalEnvironment) {
     this.global = global;
-    this.callStack = [];
   }
 
   eval(exp, env = this.global) {
     try {
-      this.#eval(exp, env);
+      return this.#eval(exp, env);
     } catch (cause) {
       const error = new Error(cause.message);
-      error.stack = this.callStack
+      error.stack = this.#callStack
         .map(call => `  at ${call.name}`)
         .reverse()
         .join('\n');
+
+      this.#callStack = [];
 
       throw error;
     }
@@ -68,6 +73,11 @@ class Ivy {
       return result;
     }
 
+    if (exp[0] === 'switch') {
+      const expression = this.#transformer.transformSwitchToIf(exp);
+      return this.#eval(expression, env);
+    }
+
     // Function declaration:
     if (exp[0] === 'fun') {
       const [, name, params, body] = exp;
@@ -107,9 +117,9 @@ class Ivy {
 
       // Native functions
       if (typeof fn === 'function') {
-        this.callStack.push(fn);
+        this.#callStack.push(fn);
         const result = fn(...args);
-        this.callStack.pop();
+        this.#callStack.pop();
         return result;
       }
 
@@ -122,9 +132,9 @@ class Ivy {
 
       const activationEnv = new Environment(activationRecord, fn.env);
 
-      this.callStack.push(fn);
+      this.#callStack.push(fn);
       const reuslt = this.#evalBody(fn.body, activationEnv);
-      this.callStack.pop();
+      this.#callStack.pop();
       return reuslt;
     }
 
