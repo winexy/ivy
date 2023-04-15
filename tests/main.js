@@ -11,19 +11,14 @@ const testsFiles = [
   './build-in-functions.test.js'
 ];
 
-const ivy = new Ivy(
-  new Environment({
-    null: null,
-    true: true,
-    false: false,
-    VERSION: '0.1'
-  })
-);
+const ivy = new Ivy();
 
 for await (const importPath of testsFiles) {
   const test = await import(importPath);
   console.log('- Running tests from', importPath);
   test.default(ivy);
 }
+
+ivy.eval(['print', '"hello"', '"world"']);
 
 console.log('All tests passed!');

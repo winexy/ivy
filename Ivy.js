@@ -1,7 +1,7 @@
 import { Environment } from './Environment.js';
 
 class Ivy {
-  constructor(global = new Environment()) {
+  constructor(global = GlobalEnvironment) {
     this.global = global;
   }
 
@@ -12,45 +12,6 @@ class Ivy {
 
     if (this.#isString(exp)) {
       return exp.slice(1, -1);
-    }
-
-    // Math operations
-
-    if (exp[0] === '+') {
-      return this.eval(exp[1], env) + this.eval(exp[2], env);
-    }
-
-    if (exp[0] === '-') {
-      return this.eval(exp[1], env) - this.eval(exp[2], env);
-    }
-
-    if (exp[0] === '*') {
-      return this.eval(exp[1], env) * this.eval(exp[2], env);
-    }
-
-    if (exp[0] === '/') {
-      return this.eval(exp[1], env) / this.eval(exp[2], env);
-    }
-
-    // Comparison operations
-    if (exp[0] === '>') {
-      return this.eval(exp[1], env) > this.eval(exp[2], env);
-    }
-
-    if (exp[0] === '<') {
-      return this.eval(exp[1], env) < this.eval(exp[2], env);
-    }
-
-    if (exp[0] === '>=') {
-      return this.eval(exp[1], env) >= this.eval(exp[2], env);
-    }
-
-    if (exp[0] === '<=') {
-      return this.eval(exp[1], env) <= this.eval(exp[2], env);
-    }
-
-    if (exp[0] === '=') {
-      return this.eval(exp[1], env) === this.eval(exp[2], env);
     }
 
     // Variable declaration:
@@ -92,6 +53,23 @@ class Ivy {
       return result;
     }
 
+    // Function calls:
+    // (print "hello world")
+    // (+ x 5)
+    // (> foo bar)
+
+    if (Array.isArray(exp)) {
+      const fn = this.eval(exp[0]);
+      const args = exp.slice(1).map(arg => this.eval(arg, env));
+
+      // Native functions
+      if (typeof fn === 'function') {
+        return fn(...args);
+      }
+
+      // User defined functions:
+    }
+
     throw `Unimplemented: ${JSON.stringify(exp)}`;
   }
 
@@ -114,8 +92,50 @@ class Ivy {
   }
 
   #isVariableName(exp) {
-    return typeof exp === 'string' && /^[a-zA-Z][a-zA-Z0-9_]*$/.test(exp);
+    return typeof exp === 'string' && /^[+\-*/<>=a-zA-Z0-9_]*$/.test(exp);
   }
 }
+
+// Default Global Environment
+const GlobalEnvironment = new Environment({
+  null: null,
+  true: true,
+  false: false,
+  VERSION: '0.1',
+  '+'(op1, op2) {
+    return op1 + op2;
+  },
+  '-'(op1, op2 = null) {
+    if (op2 == null) {
+      return -op1;
+    }
+
+    return op1 - op2;
+  },
+  '/'(op1, op2) {
+    return op1 / op2;
+  },
+  '*'(op1, op2) {
+    return op1 * op2;
+  },
+  '>'(op1, op2) {
+    return op1 > op2;
+  },
+  '<'(op1, op2) {
+    return op1 < op2;
+  },
+  '>='(op1, op2) {
+    return op1 >= op2;
+  },
+  '<='(op1, op2) {
+    return op1 <= op2;
+  },
+  '='(op1, op2) {
+    return op1 === op2;
+  },
+  print(...args) {
+    console.log(...args);
+  }
+});
 
 export { Ivy };
