@@ -2,12 +2,13 @@ import { Environment } from '../Environment.js';
 import { Ivy } from '../Ivy.js';
 
 const testsFiles = [
-  import('./self-eval.test.js'),
-  import('./math.test.js'),
-  import('./variables.test.js'),
-  import('./blocks.test.js'),
-  import('./if.test.js'),
-  import('./while.test.js')
+  './self-eval.test.js',
+  './math.test.js',
+  './variables.test.js',
+  './blocks.test.js',
+  './if.test.js',
+  './while.test.js',
+  './build-in-functions.test.js'
 ];
 
 const ivy = new Ivy(
@@ -19,9 +20,9 @@ const ivy = new Ivy(
   })
 );
 
-const tests = await Promise.all(testsFiles);
-
-for (const test of tests) {
+for await (const importPath of testsFiles) {
+  const test = await import(importPath);
+  console.log('- Running tests from', importPath);
   test.default(ivy);
 }
 
