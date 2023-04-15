@@ -11,4 +11,7 @@ export default ivy => {
   test(ivy, `(>= 4 2)`, true);
   test(ivy, `(<= 4 2)`, false);
   test(ivy, `(= 4 4)`, true);
+
+  test(ivy, '(++ 10)', 11)
+  test(ivy, '(-- 10)', 9)
 };

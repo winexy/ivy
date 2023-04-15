@@ -211,6 +211,12 @@ const GlobalEnvironment = new Environment({
   },
   print(...args) {
     console.log(...args);
+  },
+  '++'(value) {
+    return value + 1;
+  },
+  '--'(value) {
+    return value - 1;
   }
 });
 
