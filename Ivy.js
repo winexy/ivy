@@ -67,6 +67,20 @@ class Ivy {
       return env.define(name, fn);
     }
 
+    // Lambda expression
+    if (exp[0] === 'lambda') {
+      const [, params, body] = exp;
+
+      const fn = {
+        name: 'anonymous',
+        params,
+        body,
+        env
+      }
+
+      return fn;
+    }
+
     // Function calls:
     // (print "hello world")
     // (+ x 5)

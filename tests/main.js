@@ -2,14 +2,15 @@ import { Environment } from '../Environment.js';
 import { Ivy } from '../Ivy.js';
 
 const testsFiles = [
-  // './self-eval.test.js',
-  // './math.test.js',
-  // './variables.test.js',
-  // './blocks.test.js',
-  // './if.test.js',
-  // './while.test.js',
-  // './build-in-functions.test.js',
-  './user-defined-functions.test.js'
+  './self-eval.test.js',
+  './math.test.js',
+  './variables.test.js',
+  './blocks.test.js',
+  './if.test.js',
+  './while.test.js',
+  './build-in-functions.test.js',
+  './user-defined-functions.test.js',
+  './lambda.test.js'
 ];
 
 const ivy = new Ivy();
