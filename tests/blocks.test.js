@@ -1,5 +1,5 @@
 import assert from 'node:assert';
-import { testUtil } from './test-util.js';
+import { test } from './test-util.js';
 
 export default ivy => {
   assert.strictEqual(
@@ -52,7 +52,7 @@ export default ivy => {
     10
   );
 
-  testUtil.test(
+  test(
     ivy,
     `
     (begin

@@ -6,4 +6,4 @@ function test(ivy, code, expected) {
   assert.strictEqual(ivy.eval(expression), expected);
 }
 
-export const testUtil = { test };
+export { test }
