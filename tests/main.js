@@ -12,7 +12,9 @@ const testsFiles = [
   './lambda.test.js',
   './recursive.test.js',
   './stacktrace.test.js',
-  './switch.test.js'
+  './switch.test.js',
+  './inc-dec-operators.test.js',
+  './for.test.js'
 ];
 
 const ivy = new Ivy();

@@ -26,6 +26,28 @@ class Transformer {
 
     return ifExp;
   }
+
+  transformForToWhile(exp) {
+    const [, init, condition, modifier, expression] = exp;
+
+    const ast = [
+      'begin',
+      init,
+      ['while', condition, ['begin', expression, modifier]]
+    ];
+
+    return ast;
+  }
+
+  transformIncToSet(exp) {
+    const [, operand] = exp;
+    return ['set', operand, ['+', operand, 1]];
+  }
+
+  transformDecToSet(exp) {
+    const [, operand] = exp;
+    return ['set', operand, ['-', operand, 1]];
+  }
 }
 
 export { Transformer };

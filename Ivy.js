@@ -50,6 +50,16 @@ class Ivy {
       return env.lookup(exp);
     }
 
+    if (exp[0] === '++') {
+      const setExpression = this.#transformer.transformIncToSet(exp);
+      return this.#eval(setExpression, env);
+    }
+
+    if (exp[0] === '--') {
+      const setExpression = this.#transformer.transformDecToSet(exp);
+      return this.#eval(setExpression, env);
+    }
+
     if (exp[0] === 'begin') {
       const blockEnvironment = new Environment({}, env);
       return this.#evalBlock(exp.slice(1), blockEnvironment);
@@ -62,6 +72,11 @@ class Ivy {
       } else {
         return this.#eval(alternative, env);
       }
+    }
+
+    if (exp[0] === 'for') {
+      const expression = this.#transformer.transformForToWhile(exp);
+      return this.#eval(expression, env);
     }
 
     if (exp[0] === 'while') {
@@ -211,12 +226,6 @@ const GlobalEnvironment = new Environment({
   },
   print(...args) {
     console.log(...args);
-  },
-  '++'(value) {
-    return value + 1;
-  },
-  '--'(value) {
-    return value - 1;
   }
 });
 
