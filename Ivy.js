@@ -6,11 +6,11 @@ class Ivy {
   }
 
   eval(exp, env = this.global) {
-    if (isNumber(exp)) {
+    if (this.#isNumber(exp)) {
       return exp;
     }
 
-    if (isString(exp)) {
+    if (this.#isString(exp)) {
       return exp.slice(1, -1);
     }
 
@@ -65,7 +65,7 @@ class Ivy {
     }
 
     // Variable access:
-    if (isVariableName(exp)) {
+    if (this.#isVariableName(exp)) {
       return env.lookup(exp);
     }
 
@@ -104,18 +104,18 @@ class Ivy {
 
     return result;
   }
-}
 
-function isNumber(exp) {
-  return typeof exp === 'number';
-}
+  #isNumber(exp) {
+    return typeof exp === 'number';
+  }
 
-function isString(exp) {
-  return typeof exp === 'string' && exp.startsWith('"') && exp.endsWith('"');
-}
+  #isString(exp) {
+    return typeof exp === 'string' && exp.startsWith('"') && exp.endsWith('"');
+  }
 
-function isVariableName(exp) {
-  return typeof exp === 'string' && /^[a-zA-Z][a-zA-Z0-9_]*$/.test(exp);
+  #isVariableName(exp) {
+    return typeof exp === 'string' && /^[a-zA-Z][a-zA-Z0-9_]*$/.test(exp);
+  }
 }
 
 export { Ivy };
