@@ -10,7 +10,8 @@ const testsFiles = [
   './while.test.js',
   './build-in-functions.test.js',
   './user-defined-functions.test.js',
-  './lambda.test.js'
+  './lambda.test.js',
+  './recursive.test.js'
 ];
 
 const ivy = new Ivy();
