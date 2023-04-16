@@ -41,8 +41,15 @@ class Ivy {
     }
 
     if (exp[0] === 'set') {
-      const [, name, value] = exp;
-      return env.assign(name, this.#eval(value, env));
+      const [, ref, value] = exp;
+
+      if (ref[0] === 'prop') {
+        const [, instance, propName] = ref;
+        const instanceEnv = this.#eval(instance, env);
+
+        return instanceEnv.define(propName, this.#eval(value, env));
+      }
+      return env.assign(ref, this.#eval(value, env));
     }
 
     // Variable access:
@@ -121,6 +128,46 @@ class Ivy {
       return fn;
     }
 
+    // Class declaration: (class <Name> <Parent> <Body>)
+    if (exp[0] === 'class') {
+      const [, name, parent, body] = exp;
+
+      // a class is an environment -- a storage of methods and shared properties
+      const parentEnv = this.#eval(parent, env) || env;
+      const classEnv = new Environment({}, parentEnv);
+
+      // body is evaluated in the class environment
+      this.#evalBody(body, classEnv);
+
+      return env.define(name, classEnv);
+    }
+
+    // Class instantiation:  (new <Class> <Arguments>...)
+    if (exp[0] === 'new') {
+      const classEnv = this.#eval(exp[1], env);
+
+      // An instance of a class is an environment
+      // The `parent` component of the instance environment is set to its class
+      const instanceEnv = new Environment({}, classEnv);
+
+      const args = exp.slice(2).map(arg => this.#eval(arg, env));
+
+      this.#callUserDefinedFunction(classEnv.lookup('constructor'), [
+        instanceEnv,
+        ...args
+      ]);
+
+      return instanceEnv;
+    }
+
+    // Property access: (prop <instance> <name>)
+    if (exp[0] === 'prop') {
+      const [, instance, name] = exp;
+      const instanceEnv = this.#eval(instance, env);
+
+      return instanceEnv.lookup(name);
+    }
+
     // Function calls:
     // (print "hello world")
     // (+ x 5)
@@ -138,22 +185,26 @@ class Ivy {
         return result;
       }
 
-      // User defined functions:
-      const activationRecord = {};
-
-      fn.params.forEach((param, index) => {
-        activationRecord[param] = args[index];
-      });
-
-      const activationEnv = new Environment(activationRecord, fn.env);
-
-      this.#callStack.push(fn);
-      const reuslt = this.#evalBody(fn.body, activationEnv);
-      this.#callStack.pop();
-      return reuslt;
+      return this.#callUserDefinedFunction(fn, args);
     }
 
     throw `Unimplemented: ${JSON.stringify(exp)}`;
+  }
+
+  #callUserDefinedFunction(fn, args) {
+    // User defined functions:
+    const activationRecord = {};
+
+    fn.params.forEach((param, index) => {
+      activationRecord[param] = args[index];
+    });
+
+    const activationEnv = new Environment(activationRecord, fn.env);
+
+    this.#callStack.push(fn);
+    const result = this.#evalBody(fn.body, activationEnv);
+    this.#callStack.pop();
+    return result;
   }
 
   #evalBody(body, env) {

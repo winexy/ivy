@@ -14,7 +14,8 @@ const testsFiles = [
   './stacktrace.test.js',
   './switch.test.js',
   './inc-dec-operators.test.js',
-  './for.test.js'
+  './for.test.js',
+  './class.test.js'
 ];
 
 const ivy = new Ivy();
