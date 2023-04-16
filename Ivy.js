@@ -146,6 +146,14 @@ class Ivy {
       return env.define(name, classEnv);
     }
 
+    // Super expressions: (super <ClassName>)
+    if (exp[0] === 'super') {
+      const [, className] = exp;
+      const classEnv = this.#eval(className, env)
+
+      return classEnv.parentEnv;
+    }
+
     // Class instantiation:  (new <Class> <Arguments>...)
     if (exp[0] === 'new') {
       const classEnv = this.#eval(exp[1], env);

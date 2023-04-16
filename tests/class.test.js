@@ -22,13 +22,24 @@ export default ivy => {
     30
   );
 
-  // test(
-  //   ivy,
-  //   `
-  //     (begin
+  test(
+    ivy,
+    `
+      (class Point3D Point
+        (begin
+          (fun constructor (self x y z)
+            (begin
+              ((prop (super Point3D) constructor) self x y)
+              (set (prop self z) z)))
+              
+            (fun calc (self)
+              (+ ((prop (super Point3D) calc) self)
+                 (prop self z)))))
 
-  //     )
-  //   `,
-  //   30
-  // )
+      (var p (new Point3D 10 20 30))
+
+      ((prop p calc) p)
+    `,
+    60
+  )
 };
