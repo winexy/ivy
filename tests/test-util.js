@@ -1,9 +1,9 @@
 import assert from 'assert';
-import ivyParser from '../parser/ivyParser.cjs'
+import ivyParser from '../parser/ivyParser.cjs';
 
 function test(ivy, code, expected) {
-  const expression = ivyParser.parse(code);
-  assert.strictEqual(ivy.eval(expression), expected);
+  const expression = ivyParser.parse(`(begin ${code})`);
+  assert.strictEqual(ivy.evalGlobal(expression), expected);
 }
 
-export { test }
+export { test };

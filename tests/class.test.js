@@ -4,22 +4,20 @@ export default ivy => {
   test(
     ivy,
     `
-      (begin
-        (class Point null
-          (begin
+      (class Point null
+        (begin
 
-            (fun constructor (self x y)
-              (begin
-                (set (prop self x) x)
-                (set (prop self y) y)))
-                
-            (fun calc (self)
-              (+ (prop self x) (prop self y)))))
+          (fun constructor (self x y)
+            (begin
+              (set (prop self x) x)
+              (set (prop self y) y)))
+              
+          (fun calc (self)
+            (+ (prop self x) (prop self y)))))
 
-        (var p (new Point 10 20))
+      (var p (new Point 10 20))
 
-        ((prop p calc) p)
-      )
+      ((prop p calc) p)
     `,
     30
   );

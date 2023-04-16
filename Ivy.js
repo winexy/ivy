@@ -9,6 +9,10 @@ class Ivy {
     this.global = global;
   }
 
+  evalGlobal(expressions) {
+    return this.#evalBody(expressions, this.global);
+  }
+
   eval(exp, env = this.global) {
     try {
       return this.#eval(exp, env);
